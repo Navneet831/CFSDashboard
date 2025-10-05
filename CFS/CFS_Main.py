@@ -1,11 +1,16 @@
 import streamlit as st
-import Overview
-import Variance_Analysis
-import Trend_Analysis
-import Bank_Analysis
-import Transaction_details
 
-st.set_page_config(layout="wide", page_title="OPL CFS Dashboard")
+# =============================================================================
+# CORRECTED RELATIVE IMPORTS
+# =============================================================================
+# The dot (.) tells Python to look for these modules in the CURRENT FOLDER
+# (the 'CFS' folder). This is the critical fix.
+from . import Overview
+from . import Variance_Analysis
+from . import Trend_Analysis
+from . import Bank_Analysis
+from . import Transaction_details
+
 
 def main():
     st.title("CFS Dashboard")
@@ -32,6 +37,8 @@ def main():
 def app():
     main()
 
-# ✅ This allows both independent run and import into FR_Main
+# This allows the script to be run directly for testing if needed,
+# but more importantly, it works correctly when imported by app.py
 if __name__ == "__main__":
     main()
+
