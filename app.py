@@ -1,26 +1,28 @@
-import sys
-import os
 import streamlit as st
 from datetime import datetime
+
+# =============================================================================
+# CORRECTED IMPORTS FOR DEPLOYMENT
+# =============================================================================
+# REMOVED: The old `sys.path.append` lines that pointed to your local C: drive.
+# These absolute paths are the reason your deployment failed.
+
+# ADDED: Correct relative imports. This tells Python to look for the
+# 'CFS' and 'PnL' folders inside the current project directory, making it portable.
+from CFS import CFS_Main
+from PnL import PnL_Analysis
+
 
 # =============================================================================
 # MAIN APP CONFIGURATION
 # =============================================================================
 st.set_page_config(
-    layout="wide", 
+    layout="wide",
     page_title="Finance Review",
     page_icon="⚡",
     initial_sidebar_state="collapsed"
 )
 
-# --- Add necessary folders to Python path ---
-# Ensure these paths are correct for your system
-sys.path.append(r"C:\Users\hp\OneDrive\Desktop\Script\OPL\CFS")
-sys.path.append(r"C:\Users\hp\OneDrive\Desktop\Script\OPL\PnL")
-
-# --- Import your dashboard modules ---
-import CFS_Main
-import PnL_Analysis
 
 # =============================================================================
 # GLOBAL STYLING (CSS)
@@ -41,26 +43,26 @@ st.markdown(f"""
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
     .stApp {{ background-color: {BG_PRIMARY}; color: {TEXT_PRIMARY}; }}
     * {{ font-family: 'Inter', sans-serif; }}
-    
+
     /* Main Header for the P&L section */
-    .main-header {{ 
-        background: linear-gradient(135deg, {GRADIENT_START} 0%, {GRADIENT_END} 100%); 
-        padding: 1rem; 
-        border-radius: 10px; 
-        text-align: center; 
-        margin-bottom: 1rem; 
-        box-shadow: 0 8px 20px rgba(0,0,0,0.2); 
+    .main-header {{
+        background: linear-gradient(135deg, {GRADIENT_START} 0%, {GRADIENT_END} 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }}
     .main-header h1 {{ color: {TEXT_PRIMARY}; font-size: 1.5rem; font-weight: 700; margin: 0; }}
-    
+
     /* Metric Card styling used by all dashboards */
-    .metric-card {{ 
-        background: {BG_SECONDARY}; 
-        padding: 1.25rem; 
-        border-radius: 10px; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-        border: 1px solid {BORDER_COLOR}; 
-        height: 100%; 
+    .metric-card {{
+        background: {BG_SECONDARY};
+        padding: 1.25rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border: 1px solid {BORDER_COLOR};
+        height: 100%;
     }}
     .metric-value {{ font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0; }}
     .metric-value.positive {{ color: {ACCENT_SUCCESS}; }}
@@ -68,35 +70,35 @@ st.markdown(f"""
     .metric-value.neutral {{ color: {TEXT_PRIMARY}; }}
     .metric-label {{ color: {TEXT_MUTED}; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }}
     .metric-delta {{ font-size: 0.75rem; margin-top: 0.5rem; }}
-    
+
     /* Container for charts */
-    .plot-container {{ 
-        background: {BG_SECONDARY}; 
-        padding: 1.25rem; 
-        border-radius: 10px; 
-        margin-bottom: 1rem; 
+    .plot-container {{
+        background: {BG_SECONDARY};
+        padding: 1.25rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
     }}
-    
+
     /* Footer */
-    .footer {{ 
-        text-align: center; 
-        color: {TEXT_MUTED}; 
-        font-size: 0.75rem; 
-        margin-top: 1rem; 
-        padding: 0.5rem; 
-        border-top: 1px solid {BORDER_COLOR}; 
+    .footer {{
+        text-align: center;
+        color: {TEXT_MUTED};
+        font-size: 0.75rem;
+        margin-top: 1rem;
+        padding: 0.5rem;
+        border-top: 1px solid {BORDER_COLOR};
     }}
 </style>
 """, unsafe_allow_html=True)
+
 
 # =============================================================================
 # APP LAYOUT & NAVIGATION
 # =============================================================================
 
-st.sidebar.title("Dashboards")
-choice = st.sidebar.radio("Go to", ["CFS", "PnL"])
+st.sidebar.title("Navigation")
+choice = st.sidebar.radio("Go to", ["CFS", "PnL"], label_visibility="collapsed")
 
-# The global header has been REMOVED from here to prevent it from showing on the CFS page.
 
 if choice == "CFS":
     # No header is added here. This allows CFS_Main to use its own header.
@@ -105,8 +107,18 @@ if choice == "CFS":
 elif choice == "PnL":
     # The header is now placed HERE, so it only shows when PnL is selected.
     st.markdown("<div class='main-header'><h1>⚡ Financial Dashboard</h1></div>", unsafe_allow_html=True)
-    
-    tabs = st.tabs(["P&L Analysis"])
-    
-    with tabs[0]:
+
+    with st.tabs(["P&L Analysis"]):
         PnL_Analysis.app()
+
+# =============================================================================
+# FEATURE SUGGESTION BOX (as per user request)
+# =============================================================================
+with st.sidebar.expander("💡 Suggest a Feature"):
+    with st.form("suggestion_form", clear_on_submit=True):
+        suggestion = st.text_area("What feature would improve this dashboard?")
+        submitted = st.form_submit_button("Submit")
+        if submitted and suggestion:
+            # In a real-world app, you would log this suggestion to a database or file.
+            # For now, we'll just show a success message.
+            st.sidebar.success("Thank you for your feedback!")
